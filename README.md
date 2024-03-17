@@ -1,22 +1,19 @@
 # Edmonton Weather Data Visualization 
-The weather has a great impact on various aspects of human life. It plays an important role in many sectors such as agriculture, tourism, government planning, industry and so on. The meteorological department deployed sensors for each weather parameter at different geographical locations to collect data. In this project we analyze the weather conditions in Edmonton by visualizing the change in snow, rain, and temperature in the last few years.
-
+Weather profoundly impacts various aspects of human life, influencing sectors like agriculture, tourism, urban planning, and industry. The meteorological department employs sensors across different locations to collect weather data. This project focuses on analyzing Edmonton's weather conditions by visualizing changes in snow, rain, and temperature over recent years.
 ## Getting Started :
-The following instructions shall ensure that this project is up and running on your local machine for development and testing purposes. 
-See Running Code section below to know how to run this project.
-
+Follow these instructions to set up and run the project locally for development and testing purposes. Refer to the "Running Code" section below for instructions on running the project.
 ## Dataset:
-Using the City of Edmonton's Open Data Portal for fetching the weather datasets. This portal provides the Edmonton city data in different formats such as CSV, XML etc. We are using Socrata Open Data API (SODA) to fetch the weather data from the portal in JSON format to visualize the data on a real-time basis. This portal contains the weather data starting from Jan 1, 2000, to the present. It keeps adding the data daily. It contains 67,868 records capturing the day-to-day weather conditions. 
+We utilize the City of Edmonton's Open Data Portal to access weather datasets. This portal offers Edmonton's city data in various formats, including CSV and XML. We use the Socrata Open Data API (SODA) to fetch weather data from the portal in JSON format for real-time visualization. The dataset spans from January 1, 2000, to the present, with daily updates. It encompasses 67,868 records capturing day-to-day weather conditions.
 
 URL : https://data.edmonton.ca/Environmental-Services/Weather-Data-Daily-Environment-Canada/s4ws-tdws
 
 ## Prerequisites :
-•	node : v14.19.0  
-•	npm  : 6.14.19
+Node.js: v20.11.1
+npm: 10.2.4
 
 
 ## Installation:
-Follow the installation instructions present on below link for installing npm and node on CentOS PC.
+Follow the installation instructions provided in the link below to install npm and Node.js on your CentOS PC.
 
 Link: https://linuxize.com/post/how-to-install-node-js-on-centos-7/
 
@@ -27,7 +24,4 @@ Link: https://linuxize.com/post/how-to-install-node-js-on-centos-7/
 
 •	Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-## Live Website Hosted on azure 
-The above project is hosted on azure platform.
 
-Website URL : https://green-pond-031519210.1.azurestaticapps.net/
