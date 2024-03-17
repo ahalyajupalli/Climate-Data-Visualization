@@ -38,7 +38,7 @@ const Content = () => (
         </table>
       </div>
       <br/>
-      <a className="btn btn-success btn-lg btn-primary" href="https://docs.google.com/document/d/1aSKu3f_Q-6eaPNyrEIavtm1-hsCpWpy0xggsmYmWZ4s/edit?usp=sharing" role="button">
+      <a className="btn btn-success btn-lg btn-primary" href="" role="button">
           Report Link
       </a>
     </p>
