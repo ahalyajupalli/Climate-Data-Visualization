@@ -5,8 +5,10 @@ import about1 from "./plot.jpeg";
 const HeroSection = () => {
   return (
     <div className="jumbotron ">
-      <h1 className="tag1">Climate Data Visualization</h1>
-      <img src={about1} style={{"width":"70%","height":"65%"}} alt="Climate Data Visualization"/>
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+  <h1 className="tag1" style={{ marginLeft: '10%' }}>Climate Data Visualization</h1>
+</div>
+      <img src={about1} style={{"width":"100%","height":"100%"}} alt="Climate Data Visualization"/>
       <p className="tag2">
         <br/>
         This project aims at using frameworks such as Reactjs, JavaScript, HTML, CSS to visualize the data collected from City of Edmonton's Open Data. The data visualization has been done average monthly minimum temperature, average monthly maximum temperature, average monthly precipitation for a particular year and average monthly snowfall for a particular year. These parameters play a very important role in determining the climate of an area and will help to analyze and prevent situations such as heat waves, draught , floods etc.

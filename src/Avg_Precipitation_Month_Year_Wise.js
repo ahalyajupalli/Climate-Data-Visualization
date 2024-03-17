@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Plot from 'react-plotly.js';
 import './App.css';
 
-class Avg_Precipitation_Month_Year_Wise extends Component {
+class Avg_Snow_Monthly_Year_Wise extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -12,27 +12,24 @@ class Avg_Precipitation_Month_Year_Wise extends Component {
     }
 
     componentDidMount() {
-        // Add the user variable to get Precipitation for a particular year for all 12 months
-        const endpoint = "https://data.edmonton.ca/resource/s4ws-tdws.json?$query=SELECT%20year,%20avg(total_precipitation_mm)%20group%20by%20year%20order%20by%20year"
+        const endpoint = "https://data.edmonton.ca/resource/s4ws-tdws.json?$query=SELECT%20year,%20avg(snow_on_ground_cm)%20group%20by%20year%20order%20by%20year"
         fetch(endpoint)
             .then(response => response.json())
             .then(data => {
                 this.setState({ data: data })
             })
-
     }
 
     transformData(data) {
-        let plot_data = [];
-        let y = [];
+        let x = []; // For scatter and pie chart labels
+        let y = []; // For scatter plot and pie chart values
 
-        data.map(each => {
-            var precipitation = parseFloat(each.avg_total_precipitation_mm)
-            y.push(precipitation)
+        data.forEach(each => {
+            x.push(each.year);
+            y.push(parseFloat(each.avg_snow_on_ground_cm));
+        });
 
-        })
-        plot_data['y'] = y;
-        return plot_data;
+        return { x, y };
     }
 
     handleChartTypeChange = (type) => {
@@ -40,25 +37,47 @@ class Avg_Precipitation_Month_Year_Wise extends Component {
     }
 
     render() {
+        const { chartType, data } = this.state;
+        let plotData;
+
+        if (chartType === 'pie') {
+            const { x, y } = this.transformData(data);
+            plotData = [{
+                type: 'pie',
+                labels: x,
+                values: y,
+                marker: { colors: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'] }
+            }];
+        } else if (chartType === 'scatter') {
+            const { x, y } = this.transformData(data);
+            plotData = [{
+                type: 'scatter',
+                mode: 'markers',
+                x: x,
+                y: y,
+                marker: { color: '#1f77b4' }
+            }];
+        } else {
+            plotData = [{
+                type: chartType,
+                x: data.map(each => each.year),
+                y: this.transformData(data).y,
+                marker: { color: '#1f77b4' }
+            }];
+        }
+
         return (
             <div>
                 <center>
                     <Plot
-                        data={[
-                            {
-                                type: this.state.chartType,
-                                x: ["2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024"],
-                                y: this.transformData(this.state.data)['y'],
-                                marker: { color: 'blue' }
-                            }
-                        ]}
-
-                        layout={{ width: 1000, height: 800, title: "Average Yearly Precipitation in Edmonton from 2000-2024" }}
+                        data={plotData}
+                        layout={{ width: 1000, height: 800, title: `Average Yearly Snow on Ground in Edmonton from 2000-2024 (${chartType})` }}
                     />
                     <div>
                         <button onClick={() => this.handleChartTypeChange('bar')}>Bar Chart</button>
-                        <button onClick={() => this.handleChartTypeChange('scatter')}>Scatter Plot</button>
+                        <button onClick={() => this.handleChartTypeChange('pie')}>Pie Chart</button>
                         <button onClick={() => this.handleChartTypeChange('line')}>Line Chart</button>
+                        <button onClick={() => this.handleChartTypeChange('scatter')}>Scatter Plot</button>
                     </div>
                 </center>
             </div>
@@ -66,4 +85,4 @@ class Avg_Precipitation_Month_Year_Wise extends Component {
     }
 }
 
-export default Avg_Precipitation_Month_Year_Wise;
+export default Avg_Snow_Monthly_Year_Wise;

@@ -24,7 +24,7 @@
 
 .tag3{
     color:beige;
-    font-style: italic;
+    font-style: bold;
     font-family:'Times New Roman', Times, serif;
     font-weight: 400;
     font-size:20px;
@@ -100,5 +100,9 @@
   
   .cardsec .row > .col-md-3:first-child {
     margin-left: 0; /* Remove left margin for the first card in each row */
+  }
+  
+  .jumbotron {
+    background-color: #ffffff; /* Light blue color */
   }
   

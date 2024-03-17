@@ -3,7 +3,7 @@ import {Link} from "react-router-dom";
 
 const Navbar = () => {
   return (
-    <nav className="navbar navbar-expand-lg text-white bg-dark">
+    <nav className="navbar navbar-expand-lg text-white" style={{ backgroundColor: '#14a2b8' }}>
 
       <div className="collapse navbar-collapse">
         <ul className="navbar-nav mr-auto">
@@ -17,7 +17,7 @@ const Navbar = () => {
         </ul>
         
       </div>
-    </nav>
+    </nav>  
   );
 };
 
