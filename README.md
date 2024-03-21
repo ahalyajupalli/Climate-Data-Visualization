@@ -1,4 +1,4 @@
-# Edmonton Weather Data Visualization 
+# Edmonton Climate Data Visualization 
 Weather profoundly impacts various aspects of human life, influencing sectors like agriculture, tourism, urban planning, and industry. The meteorological department employs sensors across different locations to collect weather data. This project focuses on analyzing Edmonton's weather conditions by visualizing changes in snow, rain, and temperature over recent years.
 ## Getting Started :
 Follow these instructions to set up and run the project locally for development and testing purposes. Refer to the "Running Code" section below for instructions on running the project.
