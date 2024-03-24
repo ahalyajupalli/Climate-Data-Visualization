@@ -7,7 +7,9 @@ class Avg_Min_Temp_Year_Wise extends Component {
         super(props);
         this.state = {
             data: [],
-            chartType: 'bar' // default chart type
+            chartType: 'bar', // default chart type
+            filterYearStart: '',
+            filterYearEnd: ''
         }
     }
 
@@ -36,33 +38,39 @@ class Avg_Min_Temp_Year_Wise extends Component {
         this.setState({ chartType: type });
     }
 
+    handleFilterChange = (event) => {
+        this.setState({ [event.target.name]: event.target.value });
+    }
+
+    handleClick = (event) => {
+        console.log('Clicked:', event.points[0]);
+        // You can perform actions based on the clicked data point here
+    }
+
     render() {
-        const { chartType, data } = this.state;
+        const { chartType, data, filterYearStart, filterYearEnd } = this.state;
         let plotData;
 
-        if (chartType === 'pie') {
-            const { x, y } = this.transformData(data);
-            plotData = [{
-                type: 'pie',
-                labels: x,
-                values: y,
-                marker: { colors: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'] }
-            }];
-        } else if (chartType === 'scatter') {
-            const { x, y } = this.transformData(data);
+        let filteredData = data;
+        if (filterYearStart && filterYearEnd) {
+            filteredData = data.filter(entry => entry.year >= filterYearStart && entry.year <= filterYearEnd);
+        }
+
+        if (chartType === 'scatter') {
+            const { x, y } = this.transformData(filteredData);
             plotData = [{
                 type: 'scatter',
                 mode: 'markers',
                 x: x,
                 y: y,
-                marker: { color: '#1f77b4' }
+                marker: { color: 'maroon' } // Maroon color for scatter plot
             }];
         } else {
             plotData = [{
                 type: chartType,
-                x: data.map(each => each.year),
-                y: this.transformData(data).y,
-                marker: { color: '#1f77b4' }
+                x: filteredData.map(each => each.year),
+                y: this.transformData(filteredData).y,
+                marker: { color: chartType === 'bar' ? '#800080' : 'red' } // Lavender color for bar chart and red for line plot
             }];
         }
 
@@ -71,13 +79,25 @@ class Avg_Min_Temp_Year_Wise extends Component {
                 <center>
                     <Plot
                         data={plotData}
-                        layout={{ width: 1000, height: 800, title: `Average Yearly Minimum Temperature in Edmonton from 2000-2024 (${chartType})` }}
+                        layout={{
+                            width: 1000,
+                            height: 800,
+                            title: `Average Yearly Minimum Temperature in Edmonton from 2000-2024`,
+                            xaxis: { title: 'Calendar Year' }, // Update x-axis label
+                            yaxis: { title: 'Temperature (°C)' }
+                        }}
+                        onClick={this.handleClick}
                     />
-                    <div>
+                    <div className="buttons-container">
                         <button onClick={() => this.handleChartTypeChange('bar')}>Bar Chart</button>
-                        <button onClick={() => this.handleChartTypeChange('pie')}>Pie Chart</button>
                         <button onClick={() => this.handleChartTypeChange('line')}>Line Chart</button>
                         <button onClick={() => this.handleChartTypeChange('scatter')}>Scatter Plot</button>
+                    </div>
+                    <div className="filter-options">
+                        <label>Filter by Year Start:</label>
+                        <input type="number" name="filterYearStart" value={filterYearStart} onChange={this.handleFilterChange} />
+                        <label>End:</label>
+                        <input type="number" name="filterYearEnd" value={filterYearEnd} onChange={this.handleFilterChange} />
                     </div>
                 </center>
             </div>

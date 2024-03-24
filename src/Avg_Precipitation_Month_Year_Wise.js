@@ -1,88 +1,83 @@
 import React, { Component } from 'react';
 import Plot from 'react-plotly.js';
-import './App.css';
+import './App.css'; // Corrected import statement
 
-class Avg_Snow_Monthly_Year_Wise extends Component {
+class Monthly_Precipitation_Year extends Component {
     constructor(props) {
         super(props);
         this.state = {
             data: [],
-            chartType: 'bar' // default chart type
-        }
+            selectedYear: '2023', // Default selected year
+            chartType: 'bar', // Default chart type
+        };
     }
 
     componentDidMount() {
-        const endpoint = "https://data.edmonton.ca/resource/s4ws-tdws.json?$query=SELECT%20year,%20avg(snow_on_ground_cm)%20group%20by%20year%20order%20by%20year"
+        // Fetch data for all years initially
+        const endpoint = "https://data.edmonton.ca/resource/s4ws-tdws.json?$select=year,month,avg(total_rain_mm)&$group=year,month&$order=year,month";
         fetch(endpoint)
             .then(response => response.json())
             .then(data => {
-                this.setState({ data: data })
-            })
+                this.setState({ data: data });
+            });
+    }
+
+    handleYearChange = (event) => {
+        this.setState({ selectedYear: event.target.value });
     }
 
     transformData(data) {
-        let x = []; // For scatter and pie chart labels
-        let y = []; // For scatter plot and pie chart values
+        let monthlyPrecipitation = Array.from({ length: 12 }, () => 0); // Initialize array for monthly precipitation
 
         data.forEach(each => {
-            x.push(each.year);
-            y.push(parseFloat(each.avg_snow_on_ground_cm));
+            if (each.year === this.state.selectedYear) {
+                monthlyPrecipitation[parseInt(each.month) - 1] = parseFloat(each.avg_total_rain_mm);
+            }
         });
 
-        return { x, y };
-    }
-
-    handleChartTypeChange = (type) => {
-        this.setState({ chartType: type });
+        return monthlyPrecipitation;
     }
 
     render() {
-        const { chartType, data } = this.state;
+        const { data, selectedYear, chartType } = this.state;
+        const monthlyPrecipitation = this.transformData(data);
         let plotData;
 
-        if (chartType === 'pie') {
-            const { x, y } = this.transformData(data);
+        if (chartType === 'bar') {
             plotData = [{
-                type: 'pie',
-                labels: x,
-                values: y,
-                marker: { colors: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'] }
-            }];
-        } else if (chartType === 'scatter') {
-            const { x, y } = this.transformData(data);
-            plotData = [{
-                type: 'scatter',
-                mode: 'markers',
-                x: x,
-                y: y,
-                marker: { color: '#1f77b4' }
-            }];
-        } else {
-            plotData = [{
-                type: chartType,
-                x: data.map(each => each.year),
-                y: this.transformData(data).y,
-                marker: { color: '#1f77b4' }
+                type: 'bar',
+                x: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                y: monthlyPrecipitation,
+                marker: { color: 'gold' } // Set color to gold for bars
             }];
         }
 
         return (
-            <div>
-                <center>
+            <div className="container"> {/* Wrap the content in a container for styling */}
+                <div className="year-selector"> {/* Add class for styling */}
+                    <label>Select Year:</label>
+                    <select value={selectedYear} onChange={this.handleYearChange}>
+                        {/* Populate options dynamically based on available years in the dataset */}
+                        {Array.from(new Set(data.map(item => item.year))).map(year => (
+                            <option key={year} value={year}>{year}</option>
+                        ))}
+                    </select>
+                </div>
+                <div className="graph-container"> {/* Container for the graph */}
                     <Plot
                         data={plotData}
-                        layout={{ width: 1000, height: 800, title: `Average Yearly Snow on Ground in Edmonton from 2000-2024 (${chartType})` }}
+                        layout={{
+                            width: 1000,
+                            height: 800,
+                            title: `Average Monthly Precipitation in ${selectedYear}`,
+                            xaxis: { title: 'Month' },
+                            yaxis: { title: 'Precipitation (mm)' }
+                        }}
                     />
-                    <div>
-                        <button onClick={() => this.handleChartTypeChange('bar')}>Bar Chart</button>
-                        <button onClick={() => this.handleChartTypeChange('pie')}>Pie Chart</button>
-                        <button onClick={() => this.handleChartTypeChange('line')}>Line Chart</button>
-                        <button onClick={() => this.handleChartTypeChange('scatter')}>Scatter Plot</button>
-                    </div>
-                </center>
+                </div>
             </div>
-        )
+        );
     }
 }
 
-export default Avg_Snow_Monthly_Year_Wise;
+export default Monthly_Precipitation_Year;
