@@ -6,20 +6,37 @@ class Avg_Min_Temp_Year_Wise extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            data: [],
-            chartType: 'bar', // default chart type
+            yearlyData: [],
+            monthlyData: [],
+            selectedYear: '2023', // Default selected year for monthly graph
+            chartType: 'bar', // Default chart type
             filterYearStart: '',
             filterYearEnd: ''
         }
     }
 
     componentDidMount() {
+        this.fetchYearlyData();
+        this.renderMonthlyChart();
+    }
+
+    fetchYearlyData = () => {
         const endpoint = "https://data.edmonton.ca/resource/s4ws-tdws.json?$query=SELECT%20year,%20avg(minimum_temperature_c)%20group%20by%20year%20order%20by%20year";
         fetch(endpoint)
             .then(response => response.json())
             .then(data => {
-                this.setState({ data: data })
+                this.setState({ yearlyData: data })
             })
+    }
+
+    renderMonthlyChart = () => {
+        const { selectedYear } = this.state;
+        const endpoint = `https://data.edmonton.ca/resource/s4ws-tdws.json?$select=month,avg(minimum_temperature_c)&$where=year=${selectedYear}&$group=month&$order=month`;
+        fetch(endpoint)
+            .then(response => response.json())
+            .then(data => {
+                this.setState({ monthlyData: data });
+            });
     }
 
     transformData(data) {
@@ -47,18 +64,25 @@ class Avg_Min_Temp_Year_Wise extends Component {
         // You can perform actions based on the clicked data point here
     }
 
-    render() {
-        const { chartType, data, filterYearStart, filterYearEnd } = this.state;
-        let plotData;
+    handleYearChange = (event) => {
+        this.setState({ selectedYear: event.target.value }, () => {
+            this.renderMonthlyChart();
+        });
+    }
 
-        let filteredData = data;
+    render() {
+        const { selectedYear, chartType, yearlyData, monthlyData, filterYearStart, filterYearEnd } = this.state;
+        let plotDataYearly, plotDataMonthly;
+
+        // Yearly graph data
+        let filteredYearlyData = yearlyData;
         if (filterYearStart && filterYearEnd) {
-            filteredData = data.filter(entry => entry.year >= filterYearStart && entry.year <= filterYearEnd);
+            filteredYearlyData = yearlyData.filter(entry => entry.year >= filterYearStart && entry.year <= filterYearEnd);
         }
 
         if (chartType === 'scatter') {
-            const { x, y } = this.transformData(filteredData);
-            plotData = [{
+            const { x, y } = this.transformData(filteredYearlyData);
+            plotDataYearly = [{
                 type: 'scatter',
                 mode: 'markers',
                 x: x,
@@ -66,22 +90,31 @@ class Avg_Min_Temp_Year_Wise extends Component {
                 marker: { color: 'maroon' } // Maroon color for scatter plot
             }];
         } else {
-            plotData = [{
+            plotDataYearly = [{
                 type: chartType,
-                x: filteredData.map(each => each.year),
-                y: this.transformData(filteredData).y,
+                x: filteredYearlyData.map(each => each.year),
+                y: this.transformData(filteredYearlyData).y,
                 marker: { color: chartType === 'bar' ? '#800080' : 'red' } // Lavender color for bar chart and red for line plot
             }];
         }
 
+        // Monthly graph data
+        plotDataMonthly = [{
+            type: 'bar',
+            x: monthlyData.map(month => month.month),
+            y: monthlyData.map(month => parseFloat(month.avg_minimum_temperature_c)),
+            marker: { color: '#CC5500' } // Light green color for bar chart
+        }];
+
         return (
             <div>
                 <center>
+                    {/* Yearly graph */}
                     <Plot
-                        data={plotData}
+                        data={plotDataYearly}
                         layout={{
                             width: 1000,
-                            height: 800,
+                            height: 700,
                             title: `Average Yearly Minimum Temperature in Edmonton from 2000-2024`,
                             xaxis: { title: 'Calendar Year' }, // Update x-axis label
                             yaxis: { title: 'Temperature (°C)' }
@@ -99,10 +132,33 @@ class Avg_Min_Temp_Year_Wise extends Component {
                         <label>End:</label>
                         <input type="number" name="filterYearEnd" value={filterYearEnd} onChange={this.handleFilterChange} />
                     </div>
+
+                    {/* Monthly graph */}
+                    <Plot
+                        data={plotDataMonthly}
+                        layout={{
+                            width: 1000,
+                            height: 600,
+                            title: `Monthly Minimum Temperature in ${selectedYear}`,
+                            xaxis: {
+                                title: 'Month',
+                                tickvals: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                                ticktext: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                            },
+                            yaxis: { title: 'Temperature (°C)' }
+                        }}
+                    />
+                    <label className="select-year-label">Select Year:</label>
+                    <select value={selectedYear} onChange={this.handleYearChange} className="select-year-dropdown">
+                        {Array.from(new Set(yearlyData.map(item => item.year))).map((year, index) => (
+                            <option key={index} value={year}>{year}</option>
+                        ))}
+                    </select>
                 </center>
             </div>
-        )
+        );
     }
 }
 
 export default Avg_Min_Temp_Year_Wise;
+
